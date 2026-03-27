@@ -1,17 +1,27 @@
 import { useState } from "react";
+import { addTodo } from "./services/todoService";
 
 function App() {
   const [newTitle, setNewTitle] = useState("");
   const [adding, setAdding] = useState(false);
 
   // Todo 추가
-  const handleAddTodo = (e: React.FormEvent) => {
+  const handleAddTodo = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const title = newTitle.trim();
     if (!title) return;
 
     setAdding(true);
+    try {
+      addTodo(title);
+      setNewTitle("");
+    } catch (e) {
+      console.error(e);
+      alert("추가 중 오류가 발생했습니다.");
+    } finally {
+      setAdding(false);
+    }
   };
 
   return (
