@@ -1,9 +1,28 @@
-import { useState } from "react";
-import { addTodo } from "./services/todoService";
+import { useEffect, useState } from "react";
+import { addTodo, fetchTodos } from "./services/todoService";
+import type { Todo } from "./types/todo";
 
 function App() {
   const [newTitle, setNewTitle] = useState("");
   const [adding, setAdding] = useState(false);
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Todos 초기 로딩
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const data = await fetchTodos();
+        setTodos(data);
+      } catch (e) {
+        console.error(e);
+        alert("오류가 발생했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    })(); // useEffect에서는 즉시 실행 함수(IIFE) 안에서 async를 실행해야 한다.
+  }, []);
 
   // Todo 추가
   const handleAddTodo = async (e: React.FormEvent) => {
@@ -16,6 +35,8 @@ function App() {
     try {
       addTodo(title);
       setNewTitle("");
+      const data = await fetchTodos();
+      setTodos(data);
     } catch (e) {
       console.error(e);
       alert("추가 중 오류가 발생했습니다.");
@@ -45,6 +66,36 @@ function App() {
             추가
           </button>
         </form>
+        {/* 로딩 표시 */}
+        {loading && (
+          <p className="text-center text-slate-500 p-10">불러오는 중 ...</p>
+        )}
+        {/* 목록 표시 */}
+        {!loading && todos.length === 0 && (
+          <p className="text-center text-slate-500 p-10">할 일이 없습니다.</p>
+        )}
+        <ul className="space-y-2 max-h-[400px] overflow-y-auto">
+          {todos.map((todo) => (
+            <li
+              key={todo.id}
+              className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-3 py-2"
+            >
+              <label className="flex items-center gap-2 flex-1">
+                <input
+                  type="checkbox"
+                  checked={todo.completed}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm ${todo.completed ? 'text-slate-400 line-through' : 'text-slate-700'}">
+                  {todo.title}
+                </span>
+              </label>
+              <button className="text-xs text-red-500 hover:text-red-600 transition px-2 py-1">
+                삭제
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </main>
   );
