@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { addTodo, fetchTodos } from "./services/todoService";
+import { addTodo, fetchTodos, toggleTodo } from "./services/todoService";
 import type { Todo } from "./types/todo";
 
 function App() {
@@ -45,6 +45,19 @@ function App() {
     }
   };
 
+  // Todo 완료 체크 토글
+  const handleToggle = async (id: string, completed: boolean) => {
+    try {
+      await toggleTodo(id, completed);
+      setTodos((prev) =>
+        prev.map((todo) => (todo.id === id ? { ...todo, completed } : todo)),
+      );
+    } catch (e) {
+      console.error(e);
+      alert("업데이트 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
       <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-6">
@@ -84,9 +97,12 @@ function App() {
                 <input
                   type="checkbox"
                   checked={todo.completed}
+                  onChange={() => handleToggle(todo.id, !todo.completed)}
                   className="w-4 h-4"
                 />
-                <span className="text-sm ${todo.completed ? 'text-slate-400 line-through' : 'text-slate-700'}">
+                <span
+                  className={`text-sm ${todo.completed ? "text-slate-400 line-through" : "text-slate-700"}`}
+                >
                   {todo.title}
                 </span>
               </label>

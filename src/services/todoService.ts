@@ -1,9 +1,11 @@
 import {
   addDoc,
   collection,
+  doc,
   getDocs,
   orderBy,
   query,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import type { Todo } from "../types/todo";
@@ -28,4 +30,9 @@ export async function addTodo(title: string): Promise<void> {
     completed: false,
     createdAt: Date.now(),
   });
+}
+
+export async function toggleTodo(id: string, completed: boolean) {
+  const ref = doc(db, "todos", id);
+  await updateDoc(ref, { completed });
 }
