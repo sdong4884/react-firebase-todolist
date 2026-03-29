@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { addTodo, fetchTodos, toggleTodo } from "./services/todoService";
+import {
+  addTodo,
+  deleteTodo,
+  fetchTodos,
+  toggleTodo,
+} from "./services/todoService";
 import type { Todo } from "./types/todo";
 
 function App() {
@@ -58,6 +63,19 @@ function App() {
     }
   };
 
+  // Todo 삭제
+  const handleDelete = async (id: string) => {
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+
+    try {
+      await deleteTodo(id);
+      setTodos((prev) => prev.filter((todo) => todo.id !== id));
+    } catch (e) {
+      console.error(e);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
       <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg p-6">
@@ -106,7 +124,10 @@ function App() {
                   {todo.title}
                 </span>
               </label>
-              <button className="text-xs text-red-500 hover:text-red-600 transition px-2 py-1">
+              <button
+                onClick={() => handleDelete(todo.id)}
+                className="text-xs text-red-500 hover:text-red-600 transition px-2 py-1"
+              >
                 삭제
               </button>
             </li>

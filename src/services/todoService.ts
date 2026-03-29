@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   orderBy,
@@ -35,4 +36,9 @@ export async function addTodo(title: string): Promise<void> {
 export async function toggleTodo(id: string, completed: boolean) {
   const ref = doc(db, "todos", id);
   await updateDoc(ref, { completed });
+}
+
+export async function deleteTodo(id: string): Promise<void> {
+  const ref = doc(db, "todos", id);
+  await deleteDoc(ref);
 }
